@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -10,19 +11,37 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import { Snackbar } from "@mui/material";
+import { apiUrl } from "../asset/config";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
-function SignUp() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get("name"),
-      email: data.get("email"),
-      age: data.get("age"),
-      password: data.get("password"),
-    });
+function SignUp({ authToken, setAuthToken }) {
+  const [errorNotification, setErrorNotification] = useState(false);
+  const navigate = useNavigate();
+
+  const sgnUpErrorHandler = () => setErrorNotification((prev) => !prev);
+
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const user = await axios.post(`${apiUrl}/user`, {
+        name: data.get("name"),
+        email: data.get("email"),
+        age: parseInt(data.get("age")),
+        password: data.get("password"),
+      });
+      localStorage.setItem("authToken", user.data.token)
+      setAuthToken(user.data.token)
+      navigate("/");
+
+    } catch (e) {
+      console.log({ e });
+      sgnUpErrorHandler();
+    }
   };
 
   return (
@@ -118,6 +137,13 @@ function SignUp() {
             </Grid>
           </Box>
         </Box>
+        <Snackbar
+          open={errorNotification}
+          autoHideDuration={2000}
+          onClose={sgnUpErrorHandler}
+          message="Could not sign up. Please retry"
+          //   action={sgnUpErrorHandler}
+        />
       </Container>
     </ThemeProvider>
   );
