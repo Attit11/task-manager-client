@@ -3,15 +3,15 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { apiUrl } from "../asset/config";
 
-const loadData = async () => {
-  const user = await axios.get(`${apiUrl}/user/me`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-    },
-  });
-  console.log(user);
-  return user;
-};
+// const loadData = async () => {
+//   const user = await axios.get(`${apiUrl}/user/me`, {
+//     headers: {
+//       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+//     },
+//   });
+//   console.log(user);
+//   return user;
+// };
 
 function Profile() {
   const [user, setUser] = useState();
