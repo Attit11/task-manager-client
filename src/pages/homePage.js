@@ -88,20 +88,20 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-start",
 }));
 
-
-
 function HomePage() {
   const [createTaskModalOpen, setCreateTaskModalOpen] = React.useState(false);
-  // const [tasks, setTasks] = React.useState([]);
+  const [tasks, setTasks] = React.useState([]);
   const [open, setOpen] = React.useState(false);
-  const getAllTask =async () =>{
-    const tasks = await axios.get(`${apiUrl}/task`, {headers:{
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`
-    }})
-    console.log(tasks)
-  }
+  const getAllTask = async () => {
+    const tasks = await axios.get(`${apiUrl}/task`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    setTasks(tasks.data);
+  };
   React.useEffect(() => {
-    getAllTask()
+    getAllTask();
   }, []);
 
   const navigate = useNavigate();
@@ -115,27 +115,55 @@ function HomePage() {
     setOpen(false);
   };
 
- 
-
   const logoutUser = async () => {
-    
-    await axios.post(`${apiUrl}/user/logout`,{}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
+    await axios.post(
+      `${apiUrl}/user/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
     localStorage.removeItem("authToken");
     navigate("/login");
   };
 
   const logoutAllUser = async () => {
-    await axios.post(`${apiUrl}/user/logoutAll`, {},{
+    await axios.post(
+      `${apiUrl}/user/logoutAll`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
+    localStorage.removeItem("authToken");
+    navigate("/login");
+  };
+
+  const deleteTask = async (id) => {
+    await axios.delete(`${apiUrl}/task/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
       },
     });
-    localStorage.removeItem("authToken");
-    navigate("/login");
+    getAllTask();
+  };
+  const completeTask = async (id, data) => {
+    await axios.patch(
+      `${apiUrl}/task/${id}`,
+      {
+        completed: true,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
+    getAllTask();
   };
 
   return (
@@ -172,34 +200,44 @@ function HomePage() {
             },
           }}
         >
-          <Paper className="paper" elevation={3}>
-            <Typography>
-              This is the new tkin asldknlnla laksdlk lkajsdljka j;kaslkjd This
-              is the new tkin.
-            </Typography>
-            <ButtonGroup
-              // variant="contained"
-              aria-label="outlined primary button group"
-            >
-              <IconButton
-                color="primary"
-                aria-label="upload picture"
-                component="label"
-              >
-                <CheckIcon />
-              </IconButton>
-              <IconButton
-                color="primary"
-                aria-label="upload picture"
-                component="label"
-              >
-                <DeleteOutlineIcon color="warning" />
-              </IconButton>
-            </ButtonGroup>
-          </Paper>
+          {tasks.map(
+            (task) =>
+              !task.completed && (
+                <Paper
+                  key={task._id}
+                  id="not-completed"
+                  className="paper"
+                  elevation={3}
+                >
+                  <Typography>{task.description}</Typography>
+                  <ButtonGroup
+                    // variant="contained"
+                    aria-label="outlined primary button group"
+                  >
+                    <IconButton
+                      onClick={() => completeTask(task._id)}
+                      color="primary"
+                      aria-label="upload picture"
+                      component="label"
+                    >
+                      <CheckIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => deleteTask(task._id)}
+                      color="primary"
+                      aria-label="upload picture"
+                      component="label"
+                    >
+                      <DeleteOutlineIcon color="warning" />
+                    </IconButton>
+                  </ButtonGroup>
+                </Paper>
+              )
+          )}
 
           {/* create a new task */}
           <Paper
+            id="not-completed"
             style={{
               display: "flex",
               alignItems: "center",
@@ -225,15 +263,44 @@ function HomePage() {
             flexWrap: "wrap",
             "& > :not(style)": {
               m: 1,
-              width: 300,
-              height: 128,
+              width: 400,
+              height: 70,
             },
           }}
         >
-          <Paper elevation={3} />
-          <Paper elevation={3} />
-          <Paper elevation={3} />
-          <Paper elevation={3} />
+          {tasks.map(
+            (task) =>
+              task.completed && (
+                <Paper
+                  key={task._id}
+                  id="completed"
+                  className="paper"
+                  elevation={3}
+                >
+                  <Typography>{task.description}</Typography>
+                  <ButtonGroup
+                    // variant="contained"
+                    aria-label="outlined primary button group"
+                  >
+                    {/* <IconButton
+                      color="primary"
+                      aria-label="upload picture"
+                      component="label"
+                    >
+                      <CheckIcon />
+                    </IconButton> */}
+                    <IconButton
+                      color="primary"
+                      aria-label="upload picture"
+                      onClick={() => deleteTask(task._id)}
+                      component="label"
+                    >
+                      <DeleteOutlineIcon color="warning" />
+                    </IconButton>
+                  </ButtonGroup>
+                </Paper>
+              )
+          )}
         </Box>
       </Main>
       <Drawer
@@ -309,9 +376,8 @@ function HomePage() {
       >
         <Box sx={style}>
           <Task
+            getAllTask={getAllTask}
             name="Create a new Task"
-            action="Update Task"
-            // authToken={authToken}
             setCreateTaskModalOpen={setCreateTaskModalOpen}
           />
         </Box>

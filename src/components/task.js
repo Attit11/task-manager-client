@@ -15,30 +15,27 @@ import { apiUrl } from "../asset/config";
 
 function Task({
   name,
-  action,
-  description,
-  completed,
-  authToken,
   setCreateTaskModalOpen,
+  getAllTask
 }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log("AUTH TOKEN", authToken);
     await axios.post(
       `${apiUrl}/task`,
 
       {
-        data: {
-          description: data.get("description"),
-          completed: data.get("completed") === "true" ? true : false,
-        },
+        description: data.get("description"),
+        completed: data.get("completed") === "true" ? true : false,
+      },
+      {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
       }
     );
     setCreateTaskModalOpen(false);
+    getAllTask()
   };
 
   return (
