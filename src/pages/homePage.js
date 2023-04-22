@@ -89,6 +89,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 function HomePage() {
+  const [logoutUserLoading, setLogoutUserLoading] = React.useState(false)
   const [createTaskModalOpen, setCreateTaskModalOpen] = React.useState(false);
   const [tasks, setTasks] = React.useState([]);
   const [open, setOpen] = React.useState(false);
@@ -104,6 +105,8 @@ function HomePage() {
     getAllTask();
   }, []);
 
+  
+
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -116,6 +119,7 @@ function HomePage() {
   };
 
   const logoutUser = async () => {
+    setLogoutUserLoading(true)
     await axios.post(
       `${apiUrl}/user/logout`,
       {},
@@ -126,10 +130,13 @@ function HomePage() {
       }
     );
     localStorage.removeItem("authToken");
+    setLogoutUserLoading(false)
     navigate("/login");
   };
 
   const logoutAllUser = async () => {
+    setLogoutUserLoading(true)
+
     await axios.post(
       `${apiUrl}/user/logoutAll`,
       {},
@@ -140,6 +147,8 @@ function HomePage() {
       }
     );
     localStorage.removeItem("authToken");
+    setLogoutUserLoading(false)
+
     navigate("/login");
   };
 
@@ -345,7 +354,7 @@ function HomePage() {
             </ListItemButton>
           </ListItem>
           <ListItem onClick={logoutUser} key="Logout" disablePadding>
-            <ListItemButton>
+            <ListItemButton disabled={logoutUserLoading}>
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>
@@ -357,7 +366,7 @@ function HomePage() {
             key="Logout All Users"
             disablePadding
           >
-            <ListItemButton>
+            <ListItemButton disabled={logoutUserLoading}>
               <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>

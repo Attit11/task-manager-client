@@ -20,12 +20,15 @@ const theme = createTheme();
 
 function SignUp({ authToken, setAuthToken }) {
   const [errorNotification, setErrorNotification] = useState(false);
+  const [loading, setLoading] = React.useState(false);
+
   const navigate = useNavigate();
 
   const sgnUpErrorHandler = () => setErrorNotification((prev) => !prev);
 
   const handleSubmit = async (event) => {
     try {
+      setLoading(true);
       event.preventDefault();
       const data = new FormData(event.currentTarget);
       const user = await axios.post(`${apiUrl}/user`, {
@@ -34,12 +37,15 @@ function SignUp({ authToken, setAuthToken }) {
         age: parseInt(data.get("age")),
         password: data.get("password"),
       });
-      localStorage.setItem("authToken", user.data.token)
-      setAuthToken(user.data.token)
-      navigate("/");
+      localStorage.setItem("authToken", user.data.token);
+      setAuthToken(user.data.token);
+      setLoading(false);
 
+      navigate("/");
     } catch (e) {
       console.log({ e });
+      setLoading(false);
+
       sgnUpErrorHandler();
     }
   };
@@ -122,16 +128,20 @@ function SignUp({ authToken, setAuthToken }) {
             </Grid>
             <Button
               type="submit"
+              disabled={loading}
               fullWidth
               variant="contained"
-              
               sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" onClick={()=> navigate("/login")} variant="body2">
+                <Link
+                  href="#"
+                  onClick={() => navigate("/login")}
+                  variant="body2"
+                >
                   Already have an account? Sign in
                 </Link>
               </Grid>

@@ -22,7 +22,16 @@ function App() {
         path="/signup"
         element={<SignUp authToken={authToken} setAuthToken={setAuthToken} />}
       />
-      <Route path="/" element={<HomePage authToken={authToken} setAuthToken={setAuthToken}/>} />
+      <Route
+        path="/"
+        element={
+          localStorage.getItem("authToken") ? (
+            <HomePage authToken={authToken} setAuthToken={setAuthToken} />
+          ) : (
+            <Login setAuthToken={setAuthToken} />
+          )
+        }
+      />
     </Routes>
   );
 }

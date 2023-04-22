@@ -19,6 +19,7 @@ const theme = createTheme();
 
 function Login({ setAuthToken }) {
   const [errorNotification, setErrorNotification] = React.useState(false);
+  const [loading, setLoading] = React.useState(false)
   const navigate = useNavigate();
 
   const sgnUpErrorHandler = () => setErrorNotification((prev) => !prev);
@@ -26,16 +27,19 @@ function Login({ setAuthToken }) {
     event.preventDefault();
     try {
       event.preventDefault();
+      setLoading(true)
       const data = new FormData(event.currentTarget);
       const user = await axios.post(`${apiUrl}/user/login`, {
         email: data.get("email"),
         password: data.get("password"),
       });
+      setLoading(false)
       localStorage.setItem("authToken", user.data.token);
       setAuthToken(user.data.token);
       navigate("/");
     } catch (e) {
       console.log({ e });
+      setLoading(false)
       sgnUpErrorHandler();
     }
   };
@@ -91,6 +95,7 @@ function Login({ setAuthToken }) {
             <Button
               type="submit"
               fullWidth
+              disabled={loading}
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >

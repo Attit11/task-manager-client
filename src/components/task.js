@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { apiUrl } from "../asset/config";
 
 function Task({
@@ -18,8 +18,10 @@ function Task({
   setCreateTaskModalOpen,
   getAllTask
 }) {
+  const [loading, setLoading] = useState(false)
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true)
     const data = new FormData(event.currentTarget);
     await axios.post(
       `${apiUrl}/task`,
@@ -35,7 +37,10 @@ function Task({
       }
     );
     setCreateTaskModalOpen(false);
+
     getAllTask()
+    setLoading(true)
+
   };
 
   return (
@@ -82,6 +87,7 @@ function Task({
           <Button
             type="submit"
             fullWidth
+            disabled={loading}
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
