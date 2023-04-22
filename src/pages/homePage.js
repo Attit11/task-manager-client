@@ -28,6 +28,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import Task from "../components/task";
+import Profile from "../components/profile";
 
 const style = {
   position: "absolute",
@@ -89,8 +90,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 function HomePage() {
-  const [logoutUserLoading, setLogoutUserLoading] = React.useState(false)
+  const [logoutUserLoading, setLogoutUserLoading] = React.useState(false);
   const [createTaskModalOpen, setCreateTaskModalOpen] = React.useState(false);
+  const [profileModalOpen, setProfileModalOpen] = React.useState(false);
   const [tasks, setTasks] = React.useState([]);
   const [open, setOpen] = React.useState(false);
   const getAllTask = async () => {
@@ -105,8 +107,6 @@ function HomePage() {
     getAllTask();
   }, []);
 
-  
-
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -119,7 +119,7 @@ function HomePage() {
   };
 
   const logoutUser = async () => {
-    setLogoutUserLoading(true)
+    setLogoutUserLoading(true);
     await axios.post(
       `${apiUrl}/user/logout`,
       {},
@@ -130,12 +130,12 @@ function HomePage() {
       }
     );
     localStorage.removeItem("authToken");
-    setLogoutUserLoading(false)
+    setLogoutUserLoading(false);
     navigate("/login");
   };
 
   const logoutAllUser = async () => {
-    setLogoutUserLoading(true)
+    setLogoutUserLoading(true);
 
     await axios.post(
       `${apiUrl}/user/logoutAll`,
@@ -147,7 +147,7 @@ function HomePage() {
       }
     );
     localStorage.removeItem("authToken");
-    setLogoutUserLoading(false)
+    setLogoutUserLoading(false);
 
     navigate("/login");
   };
@@ -345,7 +345,13 @@ function HomePage() {
               </ListItemButton>
             </ListItem>
           ))} */}
-          <ListItem key="Profile" disablePadding>
+          <ListItem
+            onClick={() => {
+              console.log("Clicked")
+              setProfileModalOpen((prev) => !prev)}}
+            key="Profile"
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <AccountBoxIcon />
@@ -388,6 +394,17 @@ function HomePage() {
             getAllTask={getAllTask}
             name="Create a new Task"
             setCreateTaskModalOpen={setCreateTaskModalOpen}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={profileModalOpen}
+        onClose={() => setProfileModalOpen((prev) => !prev)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Profile
           />
         </Box>
       </Modal>
