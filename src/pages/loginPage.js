@@ -17,7 +17,7 @@ import { Snackbar } from "@mui/material";
 
 const theme = createTheme();
 
-function Login({setAuthToken}) {
+function Login({ setAuthToken }) {
   const [errorNotification, setErrorNotification] = React.useState(false);
   const navigate = useNavigate();
 
@@ -27,18 +27,12 @@ function Login({setAuthToken}) {
     try {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
-      console.log({
-        email: data.get("email"),
-
-        password: data.get("password"),
-      });
       const user = await axios.post(`${apiUrl}/user/login`, {
         email: data.get("email"),
-
         password: data.get("password"),
       });
-      localStorage.setItem("authToken", user.data.token)
-      setAuthToken(user.data.token)
+      localStorage.setItem("authToken", user.data.token);
+      setAuthToken(user.data.token);
       navigate("/");
     } catch (e) {
       console.log({ e });
@@ -104,7 +98,7 @@ function Login({setAuthToken}) {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link onClick={()=> navigate("/signup")} variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

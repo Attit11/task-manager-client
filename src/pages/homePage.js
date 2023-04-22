@@ -19,7 +19,27 @@ import ListItemText from "@mui/material/ListItemText";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { Paper } from "@mui/material";
+import { ButtonGroup, Modal, Paper } from "@mui/material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../asset/config";
+import "./homePage.css";
+import CheckIcon from "@mui/icons-material/Check";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AddIcon from "@mui/icons-material/Add";
+import Task from "../components/task";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 const drawerWidth = 240;
 
@@ -68,9 +88,24 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-start",
 }));
 
+
+
 function HomePage() {
-  const theme = useTheme();
+  const [createTaskModalOpen, setCreateTaskModalOpen] = React.useState(false);
+  // const [tasks, setTasks] = React.useState([]);
   const [open, setOpen] = React.useState(false);
+  const getAllTask =async () =>{
+    const tasks = await axios.get(`${apiUrl}/task`, {headers:{
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`
+    }})
+    console.log(tasks)
+  }
+  React.useEffect(() => {
+    getAllTask()
+  }, []);
+
+  const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -78,6 +113,29 @@ function HomePage() {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+ 
+
+  const logoutUser = async () => {
+    
+    await axios.post(`${apiUrl}/user/logout`,{}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    localStorage.removeItem("authToken");
+    navigate("/login");
+  };
+
+  const logoutAllUser = async () => {
+    await axios.post(`${apiUrl}/user/logoutAll`, {},{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    localStorage.removeItem("authToken");
+    navigate("/login");
   };
 
   return (
@@ -109,15 +167,55 @@ function HomePage() {
             flexWrap: "wrap",
             "& > :not(style)": {
               m: 1,
-              width: 300,
-              height: 128,
+              width: 400,
+              height: 70,
             },
           }}
         >
-          <Paper elevation={3} />
-          <Paper elevation={3} />
-          <Paper elevation={3} />
-          <Paper elevation={3} />
+          <Paper className="paper" elevation={3}>
+            <Typography>
+              This is the new tkin asldknlnla laksdlk lkajsdljka j;kaslkjd This
+              is the new tkin.
+            </Typography>
+            <ButtonGroup
+              // variant="contained"
+              aria-label="outlined primary button group"
+            >
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="label"
+              >
+                <CheckIcon />
+              </IconButton>
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="label"
+              >
+                <DeleteOutlineIcon color="warning" />
+              </IconButton>
+            </ButtonGroup>
+          </Paper>
+
+          {/* create a new task */}
+          <Paper
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            elevation={3}
+          >
+            <IconButton
+              color="primary"
+              onClick={() => setCreateTaskModalOpen((prev) => !prev)}
+              aria-label="create new task"
+              component="label"
+            >
+              <AddIcon />
+            </IconButton>
+          </Paper>
         </Box>
         <Typography>Completed Task</Typography>
         <Divider />
@@ -179,7 +277,7 @@ function HomePage() {
               <ListItemText primary="Profile" />
             </ListItemButton>
           </ListItem>
-          <ListItem key="Logout" disablePadding>
+          <ListItem onClick={logoutUser} key="Logout" disablePadding>
             <ListItemButton>
               <ListItemIcon>
                 <LogoutIcon />
@@ -187,7 +285,11 @@ function HomePage() {
               <ListItemText primary="Logout" />
             </ListItemButton>
           </ListItem>
-          <ListItem key="Logout All Users" disablePadding>
+          <ListItem
+            onClick={logoutAllUser}
+            key="Logout All Users"
+            disablePadding
+          >
             <ListItemButton>
               <ListItemIcon>
                 <ExitToAppIcon />
@@ -197,6 +299,23 @@ function HomePage() {
           </ListItem>
         </List>
       </Drawer>
+
+      {/*create a new task modal */}
+      <Modal
+        open={createTaskModalOpen}
+        onClose={() => setCreateTaskModalOpen((prev) => !prev)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Task
+            name="Create a new Task"
+            action="Update Task"
+            // authToken={authToken}
+            setCreateTaskModalOpen={setCreateTaskModalOpen}
+          />
+        </Box>
+      </Modal>
     </Box>
   );
 }
