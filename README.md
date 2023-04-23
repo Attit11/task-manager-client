@@ -8,10 +8,13 @@
 
 👨‍💻 To get started with the project, simply clone the repository and install the required dependencies. You can do this by running the following commands:
 
-bash
+
 Copy code
+
 git clone https://github.com/Attit11/task-manager-client.git
+
 cd task-manager-client
+
 npm install
 
 🔑 To access the login and signup functionality, you will need to set up a backend server with appropriate authentication mechanisms. The application uses Axios to make API calls to the server, so ensure that the server is running and configured correctly.
